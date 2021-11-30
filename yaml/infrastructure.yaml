@@ -1,0 +1,30 @@
+---
+apiVersion: xl-deploy/v1
+kind: Infrastructure
+spec:
+- name: Infrastructure/host-dev-vm
+  type: overthere.SshHost
+  os: UNIX
+  address: 192.168.78.2
+  username: demo
+  # password should be set in external file password: !value ref_key
+  password: admin
+  children:
+  - name: smokeTestRunner
+    type: smoketest.Runner
+  - name: tomcat
+    type: tomcat.Server
+    home: /opt/tomcat/tomcat-dev-9.0.21
+    startCommand: sudo systemctl start tomcat
+    stopCommand: sudo systemctl stop tomcat
+    statusCommand: sudo systemctl status tomcat
+    children:
+    - name: tomcat_vh
+      type: tomcat.VirtualHost
+  - name: mysql
+    type: sql.MySqlClient
+    username: admin
+    # password should be set in external file password: !value ref_key
+    password: admin
+    mySqlHome: /usr
+    databaseName: demo
